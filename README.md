@@ -31,10 +31,6 @@ That's it
 
 More info to follow.
 
-```dart
-const like = 'sample';
-```
-
 ## Additional information
 
 This is a preliminary package. More details will follow soon.
