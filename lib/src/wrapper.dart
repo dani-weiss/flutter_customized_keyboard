@@ -98,10 +98,18 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
   }
 
   /// Hide keyboard
-  void hideKeyboard(String id) {
+  ///
+  /// If no [id] is provided, hide all keyboards.
+  void hideKeyboard({String? id}) {
     // Animate out
     _animationController.reverse().then((_) => setState(() {
-          _keyboardConnections.removeWhere((connection) => connection.id == id);
+          _keyboardConnections.removeWhere((connection) {
+            if (id != null) {
+              return connection.id == id;
+            } else {
+              return true;
+            }
+          });
           bottomInset = 0.0;
         }));
   }

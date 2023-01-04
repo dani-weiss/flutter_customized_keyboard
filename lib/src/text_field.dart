@@ -500,7 +500,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   void dispose() {
     controller?.dispose();
-    keyboardWrapper?.hideKeyboard(connection!.id);
+    keyboardWrapper?.hideKeyboard(id: connection!.id);
     focusNode?.dispose();
 
     super.dispose();
@@ -553,7 +553,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       if (focusNode!.hasFocus) {
         keyboardWrapper?.showKeyboard(connection!);
       } else {
-        keyboardWrapper?.hideKeyboard(connection!.id);
+        keyboardWrapper?.hideKeyboard(id: connection!.id);
       }
     }
   }
