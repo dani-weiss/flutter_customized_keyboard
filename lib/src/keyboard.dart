@@ -5,6 +5,5 @@ abstract class CustomKeyboard {
   abstract final String name;
   Widget build(BuildContext context);
 
-  static CustomTextInputType nameToInputType(String name) =>
-      CustomTextInputType(name: name);
+  CustomTextInputType get inputType => CustomTextInputType(name: name);
 }
