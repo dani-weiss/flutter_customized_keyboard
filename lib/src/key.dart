@@ -2,7 +2,7 @@ part of "../customized_keyboard.dart";
 
 class CustomKeyboardKey extends StatelessWidget {
   final Widget child;
-  final CustomKeyboardEvent keyEvent;
+  final CustomKeyboardEvent? keyEvent;
 
   const CustomKeyboardKey({super.key, required this.child, required this.keyEvent});
 
@@ -17,7 +17,8 @@ class CustomKeyboardKey extends StatelessWidget {
     if (keyboardWrapper == null) {
       throw KeyboardWrapperNotFound();
     }
-
-    keyboardWrapper.onKey(keyEvent);
+    if (keyEvent != null) {
+      keyboardWrapper.onKey(keyEvent!);
+    }
   }
 }
