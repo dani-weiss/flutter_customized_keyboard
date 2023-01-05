@@ -50,9 +50,14 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
         MediaQueryData.fromWindow(WidgetsBinding.instance.window);
 
     return MediaQuery(
-      data: data.copyWith(
-        viewInsets: data.viewInsets.copyWith(bottom: bottomInset + data.padding.bottom),
-      ),
+      // Overwrite data to apply bottom inset for customized keyboard
+      // if supposed to be shown.
+      data: currentKeyboard != null
+          ? data.copyWith(
+              viewInsets:
+                  data.viewInsets.copyWith(bottom: bottomInset + data.padding.bottom),
+            )
+          : data,
       child: Stack(children: [
         widget.child,
         if (currentKeyboard != null)
