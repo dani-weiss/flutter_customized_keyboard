@@ -205,6 +205,9 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
       case CustomKeyType.previous:
         _keyboardConnection!.focusNode.previousFocus();
         break;
+      case CustomKeyType.hideKeyboard:
+        hideKeyboard();
+        break;
     }
   }
 }

@@ -806,6 +806,21 @@ class _CustomTextFieldState extends State<CustomTextField> with RestorationMixin
     }
   }
 
+  void onTap() {
+    // If this field is already focused and the keyboard connection is inactive,
+    // -> reactivate it.
+    // This happens when the user manually closed the keyboard.
+    if (_connection?.isActive == false &&
+        _effectiveFocusNode.hasFocus &&
+        _isCustomKeyboard) {
+      _keyboardWrapper?.connect(_connection!);
+    }
+
+    if (widget.onTap != null) {
+      widget.onTap!();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return TextField(
@@ -854,7 +869,7 @@ class _CustomTextFieldState extends State<CustomTextField> with RestorationMixin
       dragStartBehavior: widget.dragStartBehavior,
       enableInteractiveSelection: widget.enableInteractiveSelection,
       selectionControls: widget.selectionControls,
-      onTap: widget.onTap,
+      onTap: onTap,
       onTapOutside: widget.onTapOutside,
       mouseCursor: widget.mouseCursor,
       buildCounter: widget.buildCounter,
