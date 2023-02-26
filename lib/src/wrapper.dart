@@ -16,22 +16,21 @@ class KeyboardWrapper extends StatefulWidget {
 
 class KeyboardWrapperState extends State<KeyboardWrapper>
     with SingleTickerProviderStateMixin {
-  /// Holds the indexes of keyboards to show.
-  ///
-  /// The last requested keyboard is shown as long as this list
-  /// is not empty. This is neccessary as focus events fire first
-  /// for the newly focused field and then for the now unfocused field.
-  final List<CustomKeyboardConnection> _keyboardConnections = [];
+  /// Holds the active connection to a [CustomTextField]
+  CustomKeyboardConnection? _keyboardConnection;
 
   late final AnimationController _animationController;
-  Animation<Offset>? _animationPosition;
-  double bottomInset = 0.0;
+  late Animation<Offset> _animationPosition;
+  double _bottomInset = 0.0;
+  Widget? _activeKeyboard;
+  double _keyboardHeight = 0;
 
   @override
   void initState() {
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 200),
+      reverseDuration: const Duration(milliseconds: 200),
     );
 
     _animationPosition = Tween<Offset>(
@@ -50,34 +49,30 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
         MediaQueryData.fromWindow(WidgetsBinding.instance.window);
 
     return MediaQuery(
-      // Overwrite data to apply bottom inset for customized keyboard
-      // if supposed to be shown.
-      data: currentKeyboard != null
-          ? data.copyWith(
-              viewInsets:
-                  data.viewInsets.copyWith(bottom: bottomInset + data.padding.bottom),
+        // Overwrite data to apply bottom inset for customized keyboard
+        // if supposed to be shown.
+        data: _activeKeyboard != null
+            ? data.copyWith(
+                viewInsets:
+                    data.viewInsets.copyWith(bottom: _bottomInset + data.padding.bottom),
+              )
+            : data,
+        child: Stack(children: [
+          widget.child,
+          if (_activeKeyboard != null)
+            Positioned(
+              bottom: 0,
+              width: data.size.width,
+              height: (_keyboardHeight + data.padding.bottom),
+              child: SlideTransition(
+                position: _animationPosition,
+                child: Material(
+                  child: _activeKeyboard,
+                ),
+              ),
             )
-          : data,
-      child: Stack(children: [
-        widget.child,
-        if (currentKeyboard != null)
-          Positioned(
-            bottom: 0,
-            width: data.size.width,
-            height: currentKeyboard!.height + data.padding.bottom,
-            child: SlideTransition(
-              position: _animationPosition!,
-              child: currentKeyboard!.build(context),
-            ),
-          )
-      ]),
-    );
+        ]));
   }
-
-  /// Get current keyboard or null
-  CustomKeyboard? get currentKeyboard => _keyboardConnections.isNotEmpty
-      ? getKeyboardByName(_keyboardConnections.last.name)
-      : null;
 
   CustomKeyboard getKeyboardByName(String name) {
     try {
@@ -88,55 +83,94 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
     }
   }
 
-  /// Show keyboard
-  void showKeyboard(CustomKeyboardConnection connection) {
-    // Verify that the keyboard exists -> throw otherwise
-    getKeyboardByName(connection.name);
-    setState(() {
-      _keyboardConnections.add(connection);
-    });
+  /// Connect with a custom keyboard
+  void connect(CustomKeyboardConnection connection) {
+    // Verify that the keyboard exists -> throws otherwise
+    final keyboard = getKeyboardByName(connection.name);
 
-    // Animate in
-    _animationController
-        .forward()
-        .then((_) => setState(() => bottomInset = currentKeyboard?.height ?? 0.0));
+    // Set as active
+    connection.isActive = true;
+
+    // Is a keyboard currently shown and is it the same as the requested one?
+    if (_keyboardConnection?.name == connection.name) {
+      // Only change the connection to send events to the new text field, discarding the
+      // old one.
+      _keyboardConnection = connection;
+    }
+    // Is another keyboard currently shown?
+    else if (_keyboardConnection != null) {
+      // Hide old keyboard in an animation
+      // Then animate the new keyboard in
+      _animateOut().then((_) {
+        _keyboardConnection = connection;
+        _animateIn(keyboard: keyboard);
+      });
+    }
+    // No keyboard shown yet?
+    else {
+      // Animate new keyboard in and set connection
+      _keyboardConnection = connection;
+      _animateIn(keyboard: keyboard);
+    }
   }
 
-  /// Hide keyboard
-  ///
-  /// If no [id] is provided, hide all keyboards.
-  void hideKeyboard({String? id}) {
-    // Animate out
-    _animationController.reverse().then((_) => setState(() {
-          _keyboardConnections.removeWhere((connection) {
-            if (id != null) {
-              return connection.id == id;
-            } else {
-              return true;
-            }
-          });
-          bottomInset = 0.0;
-        }));
+  /// Animate keyboard in
+  Future<void> _animateIn({required CustomKeyboard keyboard}) {
+    setState(() {
+      _activeKeyboard = keyboard.build(context);
+      _keyboardHeight = keyboard.height;
+    });
+    return _animationController
+        .forward()
+        .then((value) => setState(() => _bottomInset = _keyboardHeight));
+  }
+
+  /// Animate keyboard out
+  Future<void> _animateOut() {
+    setState(() => _bottomInset = 0.0);
+    return _animationController.reverse();
+  }
+
+  /// Disconnect the given connection id
+  void disconnect({required String id}) {
+    // Is the current connection id active?
+    if (_keyboardConnection?.id == id) {
+      // Set as inactive
+      _keyboardConnection!.isActive = false;
+
+      // Remove it and hide the keyboard
+      _keyboardConnection = null;
+      _animateOut();
+    }
+
+    // Otherwise, do nothing.
+  }
+
+  /// Hides the keyboard if currently shown
+  void hideKeyboard() {
+    if (_keyboardConnection != null) {
+      return disconnect(id: _keyboardConnection!.id);
+    }
   }
 
   /// Add character to text field
   void onKey(CustomKeyboardEvent key) {
     void replaceSelection({TextSelection? selection, String newText = ""}) {
       // Remove all selected text
-      final orig = _keyboardConnections.last.controller.value;
+      final orig = _keyboardConnection!.controller.value;
 
       // Use provided selection over actual selection
       final selectionToUse = selection ?? orig.selection;
       final textBefore = selectionToUse.textBefore(orig.text);
       final textAfter = selectionToUse.textAfter(orig.text);
-      _keyboardConnections.last.controller.value = orig.copyWith(
+      _keyboardConnection!.controller.value = orig.copyWith(
         text: "$textBefore$newText$textAfter",
         selection: TextSelection.collapsed(offset: selectionToUse.start + newText.length),
       );
     }
 
     // Throw if keyboard connection not found
-    if (_keyboardConnections.isEmpty) {
+    if (_keyboardConnection == null) {
       throw KeyboardMissingConnection();
     }
 
@@ -145,12 +179,12 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
         replaceSelection(newText: key.value!);
         break;
       case CustomKeyType.submit:
-        if (_keyboardConnections.last.onSubmit != null) {
-          _keyboardConnections.last.onSubmit!(_keyboardConnections.last.controller.text);
+        if (_keyboardConnection!.onSubmit != null) {
+          _keyboardConnection!.onSubmit!(_keyboardConnection!.controller.text);
         }
         break;
       case CustomKeyType.deleteOne:
-        final orig = _keyboardConnections.last.controller.value;
+        final orig = _keyboardConnection!.controller.value;
         if (orig.selection.start != -1) {
           // Text selected?
           if (orig.selection.start != orig.selection.end) {
@@ -166,7 +200,10 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
         }
         break;
       case CustomKeyType.next:
-        _keyboardConnections.last.focusNode.nextFocus();
+        _keyboardConnection!.focusNode.nextFocus();
+        break;
+      case CustomKeyType.previous:
+        _keyboardConnection!.focusNode.previousFocus();
         break;
     }
   }
