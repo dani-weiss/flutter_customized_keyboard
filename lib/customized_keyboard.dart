@@ -14,3 +14,4 @@ part "src/event.dart";
 part "src/key.dart";
 part "src/text_field.dart";
 part "src/text_input_type.dart";
+part "src/text_form_field.dart";
