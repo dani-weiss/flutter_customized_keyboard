@@ -21,8 +21,9 @@ Feedback or contributions are always welcome.
 ## Getting started
 
 * Add the package to your pubspec.yaml
-* Wrap your Scaffold in [CustomizedKeyboardWrapper]
-* Use [CustomizedTextField] instead of [TextField]
+* Wrap your Scaffold in [KeyboardWrapper]
+* Use [CustomTextField] instead of [TextField]
+* Use [CustomTextFormField] instead of [TextFormField]
 * Create your own customized keyboard (tutorial will follow)
 
 That's it
