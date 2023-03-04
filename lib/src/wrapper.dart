@@ -170,7 +170,9 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
     }
 
     // Throw if keyboard connection not found
-    if (_keyboardConnection == null) {
+    // Ignore if hideKeyboard type because the field might have lost focus and disconnected
+    // before this method is called. It won't hurt to call [hideKeyboard()] multiple times.
+    if (_keyboardConnection == null && key.type != CustomKeyType.hideKeyboard) {
       throw KeyboardMissingConnection();
     }
 
