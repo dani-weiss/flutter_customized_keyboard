@@ -4,7 +4,20 @@ class KeyboardWrapper extends StatefulWidget {
   final Widget child;
   final List<CustomKeyboard> keyboards;
 
-  const KeyboardWrapper({super.key, required this.child, this.keyboards = const []});
+  /// Will be called before showing any keyboard.
+  ///
+  /// If it returns true, the requested keyboard is shown, otherwise the keyboard
+  /// request is ignored.
+  ///
+  /// Use this to prevent keyboards showing on desktop devices for example.
+  final bool Function(CustomKeyboard)? shouldShow;
+
+  const KeyboardWrapper({
+    super.key,
+    required this.child,
+    this.keyboards = const [],
+    this.shouldShow,
+  });
 
   static KeyboardWrapperState? of(BuildContext context) {
     return context.findAncestorStateOfType<KeyboardWrapperState>();
@@ -87,6 +100,11 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
   void connect(CustomKeyboardConnection connection) {
     // Verify that the keyboard exists -> throws otherwise
     final keyboard = getKeyboardByName(connection.name);
+
+    // Should we show this keyboard?
+    if (widget.shouldShow?.call(keyboard) == false) {
+      return;
+    }
 
     // Set as active
     connection.isActive = true;
