@@ -7,6 +7,7 @@ class CustomKeyboardConnection {
   final TextEditingController controller;
   final FocusNode focusNode;
   bool isActive;
+  void Function() triggerOnChanged;
 
   CustomKeyboardConnection({
     required this.name,
@@ -14,5 +15,6 @@ class CustomKeyboardConnection {
     required this.controller,
     required this.focusNode,
     this.isActive = false,
+    required this.triggerOnChanged,
   }) : id = const Uuid().v4();
 }

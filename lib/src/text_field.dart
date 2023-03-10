@@ -709,10 +709,12 @@ class _CustomTextFieldState extends State<CustomTextField> with RestorationMixin
 
       // Initialize connection object
       _connection = CustomKeyboardConnection(
-          name: (widget.keyboardType as CustomTextInputType).name,
-          controller: _effectiveController,
-          focusNode: _effectiveFocusNode,
-          onSubmit: widget.onSubmitted);
+        name: (widget.keyboardType as CustomTextInputType).name,
+        controller: _effectiveController,
+        focusNode: _effectiveFocusNode,
+        triggerOnChanged: _triggerOnChanged,
+        onSubmit: widget.onSubmitted,
+      );
     } else {
       // Not a custom keyboard, don't do anything here.
       // This effectively turns into an empty wrapper.
@@ -790,7 +792,17 @@ class _CustomTextFieldState extends State<CustomTextField> with RestorationMixin
     }
   }
 
-  void onTap() {
+  /// Manually triggers the onChanged callback of this field.
+  /// This is necessary because value changes on the controller will not lead to
+  /// onChanged being triggered.
+  /// @See https://api.flutter.dev/flutter/material/TextField/onChanged.html for more details.
+  void _triggerOnChanged() {
+    if (widget.onChanged != null) {
+      widget.onChanged!(_effectiveController.text);
+    }
+  }
+
+  void _onTap() {
     // If this field is already focused and the keyboard connection is inactive,
     // -> reactivate it.
     // This happens when the user manually closed the keyboard.
@@ -852,7 +864,7 @@ class _CustomTextFieldState extends State<CustomTextField> with RestorationMixin
       dragStartBehavior: widget.dragStartBehavior,
       enableInteractiveSelection: widget.enableInteractiveSelection,
       selectionControls: widget.selectionControls,
-      onTap: onTap,
+      onTap: _onTap,
       onTapOutside: widget.onTapOutside,
       mouseCursor: widget.mouseCursor,
       buildCounter: widget.buildCounter,

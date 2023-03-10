@@ -185,6 +185,9 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
         text: "$textBefore$newText$textAfter",
         selection: TextSelection.collapsed(offset: selectionToUse.start + newText.length),
       );
+
+      // Trigger onChanged event on text field
+      _keyboardConnection!.triggerOnChanged();
     }
 
     // Throw if keyboard connection not found
