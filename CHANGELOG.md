@@ -1,3 +1,6 @@
+## 0.8.3
+* Fix issue with wrong bottom insets.
+
 ## 0.8.2
 * The [onChanged] callback of [CustomTextField] is now called on custom keyboard events.
 
