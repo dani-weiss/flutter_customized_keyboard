@@ -66,8 +66,8 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
         // if supposed to be shown.
         data: _activeKeyboard != null
             ? data.copyWith(
-                viewInsets:
-                    data.viewInsets.copyWith(bottom: _bottomInset + data.padding.bottom),
+                viewInsets: data.viewInsets.copyWith(
+                    bottom: _bottomInset + data.viewInsets.bottom + data.padding.bottom),
               )
             : data,
         child: Stack(children: [
