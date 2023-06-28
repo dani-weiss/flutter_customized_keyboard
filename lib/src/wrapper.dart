@@ -145,7 +145,7 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
       // Ensure the currently active field is shown and not hidden by the keyboard
       if (fieldContext != null) {
         WidgetsBinding.instance
-            .addPersistentFrameCallback((_) => Scrollable.ensureVisible(fieldContext!));
+            .addPersistentFrameCallback((_) => Scrollable.ensureVisible(fieldContext));
       }
     });
   }
