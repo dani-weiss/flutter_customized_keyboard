@@ -121,26 +121,33 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
       // Then animate the new keyboard in
       _animateOut().then((_) {
         _keyboardConnection = connection;
-        _animateIn(keyboard: keyboard);
+        _animateIn(keyboard: keyboard, fieldContext: connection.focusNode.context);
       });
     }
     // No keyboard shown yet?
     else {
       // Animate new keyboard in and set connection
       _keyboardConnection = connection;
-      _animateIn(keyboard: keyboard);
+      _animateIn(keyboard: keyboard, fieldContext: connection.focusNode.context);
     }
   }
 
   /// Animate keyboard in
-  Future<void> _animateIn({required CustomKeyboard keyboard}) {
+  Future<void> _animateIn(
+      {required CustomKeyboard keyboard, required BuildContext? fieldContext}) {
     setState(() {
       _activeKeyboard = keyboard.build(context);
       _keyboardHeight = keyboard.height;
     });
-    return _animationController
-        .forward()
-        .then((value) => setState(() => _bottomInset = _keyboardHeight));
+    return _animationController.forward().then((value) {
+      setState(() => _bottomInset = _keyboardHeight);
+
+      // Ensure the currently active field is shown and not hidden by the keyboard
+      if (fieldContext != null) {
+        WidgetsBinding.instance
+            .addPersistentFrameCallback((_) => Scrollable.ensureVisible(fieldContext!));
+      }
+    });
   }
 
   /// Animate keyboard out
