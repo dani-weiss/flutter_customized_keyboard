@@ -1,3 +1,7 @@
+## 0.8.5
+
+* Fix 0.8.4: Used to prevent scrolling.
+
 ## 0.8.4
 
 * Ensure the active text field is still visible after the keyboard animation completes.
