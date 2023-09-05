@@ -8,6 +8,7 @@ class CustomKeyboardConnection {
   final FocusNode focusNode;
   bool isActive;
   void Function() triggerOnChanged;
+  final List<TextInputFormatter>? inputFormatters;
 
   CustomKeyboardConnection({
     required this.name,
@@ -16,5 +17,6 @@ class CustomKeyboardConnection {
     required this.focusNode,
     this.isActive = false,
     required this.triggerOnChanged,
+    required this.inputFormatters,
   }) : id = const Uuid().v4();
 }

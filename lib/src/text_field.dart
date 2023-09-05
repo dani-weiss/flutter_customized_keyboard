@@ -713,6 +713,7 @@ class _CustomTextFieldState extends State<CustomTextField> with RestorationMixin
         controller: _effectiveController,
         focusNode: _effectiveFocusNode,
         triggerOnChanged: _triggerOnChanged,
+        inputFormatters: widget.inputFormatters,
         onSubmit: widget.onSubmitted,
       );
     } else {

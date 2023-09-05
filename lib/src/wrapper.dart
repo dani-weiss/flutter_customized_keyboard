@@ -182,16 +182,32 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
   void onKey(CustomKeyboardEvent key) {
     void replaceSelection({TextSelection? selection, String newText = ""}) {
       // Remove all selected text
-      final orig = _keyboardConnection!.controller.value;
+      final originalValue = _keyboardConnection!.controller.value;
 
       // Use provided selection over actual selection
-      final selectionToUse = selection ?? orig.selection;
-      final textBefore = selectionToUse.textBefore(orig.text);
-      final textAfter = selectionToUse.textAfter(orig.text);
-      _keyboardConnection!.controller.value = orig.copyWith(
+      final selectionToUse = selection ?? originalValue.selection;
+
+      // Generate new text value
+      final textBefore = selectionToUse.textBefore(originalValue.text);
+      final textAfter = selectionToUse.textAfter(originalValue.text);
+      final newValue = originalValue.copyWith(
         text: "$textBefore$newText$textAfter",
         selection: TextSelection.collapsed(offset: selectionToUse.start + newText.length),
       );
+
+      // Apply input formatters
+      // This is not done automatically by the field because we're effectively changing
+      // the value programatically.
+      TextEditingValue formattedValue = newValue;
+      final formatters = _keyboardConnection!.inputFormatters;
+      if (formatters != null && formatters.isNotEmpty) {
+        formatters.forEach((formatter) {
+          formattedValue = formatter.formatEditUpdate(originalValue, formattedValue);
+        });
+      }
+
+      // Set new value
+      _keyboardConnection!.controller.value = formattedValue;
 
       // Trigger onChanged event on text field
       _keyboardConnection!.triggerOnChanged();

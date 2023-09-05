@@ -1,3 +1,7 @@
+## 0.8.6
+
+* [inputFormatters] will now be properly called.
+
 ## 0.8.5
 
 * Fix 0.8.4: Used to prevent scrolling.
