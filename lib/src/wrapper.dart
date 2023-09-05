@@ -201,9 +201,9 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
       TextEditingValue formattedValue = newValue;
       final formatters = _keyboardConnection!.inputFormatters;
       if (formatters != null && formatters.isNotEmpty) {
-        formatters.forEach((formatter) {
+        for (var formatter in formatters) {
           formattedValue = formatter.formatEditUpdate(originalValue, formattedValue);
-        });
+        }
       }
 
       // Set new value
