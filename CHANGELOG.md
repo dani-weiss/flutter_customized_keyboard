@@ -1,3 +1,7 @@
+## 0.8.7
+
+* Keyboard can be hidden even if no active connection.
+
 ## 0.8.6
 
 * [inputFormatters] will now be properly called.

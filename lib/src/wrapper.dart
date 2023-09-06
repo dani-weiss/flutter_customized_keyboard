@@ -173,8 +173,12 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
 
   /// Hides the keyboard if currently shown
   void hideKeyboard() {
+    // Disconnect and hide if keyboard connection is still active
     if (_keyboardConnection != null) {
       return disconnect(id: _keyboardConnection!.id);
+    } else {
+      // Otherwise, just animate out
+      _animateOut();
     }
   }
 
