@@ -249,6 +249,11 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
           }
         }
         break;
+      case CustomKeyType.clear:
+        final origText = _keyboardConnection!.controller.text;
+        replaceSelection(
+            selection: TextSelection(baseOffset: 0, extentOffset: origText.length));
+        break;
       case CustomKeyType.next:
         _keyboardConnection!.focusNode.nextFocus();
         break;

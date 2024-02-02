@@ -1,3 +1,9 @@
+## 1.0.0
+
+* Using flutter v3.16.1
+* Updated uuid dependecy to v4.3.3
+* Custom key event to clear the whole textfield.
+
 ## 0.8.7
 
 * Keyboard can be hidden even if no active connection.

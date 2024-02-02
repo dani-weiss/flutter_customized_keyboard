@@ -1,6 +1,6 @@
 part of "../customized_keyboard.dart";
 
-enum CustomKeyType { character, submit, next, deleteOne, previous, hideKeyboard }
+enum CustomKeyType { character, submit, next, deleteOne, clear, previous, hideKeyboard }
 
 class CustomKeyboardEvent {
   final CustomKeyType type;
@@ -18,6 +18,9 @@ class CustomKeyboardEvent {
         value = null;
   const CustomKeyboardEvent.deleteOne()
       : type = CustomKeyType.deleteOne,
+        value = null;
+  const CustomKeyboardEvent.clear()
+      : type = CustomKeyType.clear,
         value = null;
   const CustomKeyboardEvent.hideKeyboard()
       : type = CustomKeyType.hideKeyboard,
