@@ -141,12 +141,6 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
     });
     return _animationController.forward().then((value) {
       setState(() => _bottomInset = _keyboardHeight);
-
-      // Ensure the currently active field is shown and not hidden by the keyboard
-      if (fieldContext != null) {
-        WidgetsBinding.instance
-            .addPostFrameCallback((_) => Scrollable.ensureVisible(fieldContext));
-      }
     });
   }
 
