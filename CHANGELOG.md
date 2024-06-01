@@ -1,3 +1,6 @@
+## 1.0.1
+* Remove auto-scroll behavior
+
 ## 1.0.0
 
 * Using flutter v3.16.1

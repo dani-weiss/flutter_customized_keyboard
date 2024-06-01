@@ -141,6 +141,26 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
     });
     return _animationController.forward().then((value) {
       setState(() => _bottomInset = _keyboardHeight);
+
+      // Ensure the currently active field is shown and not hidden by the keyboard
+      // -- only if item is not visible anyways --
+      if (fieldContext != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final visibilityState = isItemVisible(fieldContext);
+
+          switch (visibilityState) {
+            case VisibilityState.hiddenAbove:
+              Scrollable.ensureVisible(fieldContext, alignment: 0.1);
+              break;
+            case VisibilityState.hiddenBelow:
+              Scrollable.ensureVisible(fieldContext, alignment: 0.9);
+              break;
+            case VisibilityState.visible:
+              // Do nothing
+              break;
+          }
+        });
+      }
     });
   }
 
