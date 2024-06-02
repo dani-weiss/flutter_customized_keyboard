@@ -269,10 +269,26 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
             selection: TextSelection(baseOffset: 0, extentOffset: origText.length));
         break;
       case CustomKeyType.next:
-        _keyboardConnection!.focusNode.nextFocus();
+        if (_keyboardConnection!.onNext != null) {
+          _keyboardConnection!.onNext!();
+        } else {
+          try {
+            _keyboardConnection!.focusNode.nextFocus();
+          } catch (e) {
+            throw KeyboardErrorFocusNext(e);
+          }
+        }
         break;
       case CustomKeyType.previous:
-        _keyboardConnection!.focusNode.previousFocus();
+        if (_keyboardConnection!.onPrev != null) {
+          _keyboardConnection!.onPrev!();
+        } else {
+          try {
+            _keyboardConnection!.focusNode.previousFocus();
+          } catch (e) {
+            throw KeyboardErrorFocusPrev(e);
+          }
+        }
         break;
       case CustomKeyType.hideKeyboard:
         hideKeyboard();

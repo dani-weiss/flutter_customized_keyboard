@@ -74,7 +74,7 @@ part of "../customized_keyboard.dart";
 ///    surround the actual text editing widget.
 ///  * Learn how to use a [TextEditingController] in one of our [cookbook recipes](https://flutter.dev/docs/cookbook/forms/text-field-changes#2-use-a-texteditingcontroller).
 class CustomTextFormField extends FormField<String> {
-  /// Creates a [FormField] that contains a [TextField].
+  /// Creates a [FormField] that contains a [CustomTextField].
   ///
   /// When a [controller] is specified, [initialValue] must be null (the
   /// default). If [controller] is null, then a [TextEditingController]
@@ -116,6 +116,8 @@ class CustomTextFormField extends FormField<String> {
     TapRegionCallback? onTapOutside,
     VoidCallback? onEditingComplete,
     ValueChanged<String>? onFieldSubmitted,
+    void Function()? onNext,
+    void Function()? onPrev,
     super.onSaved,
     super.validator,
     List<TextInputFormatter>? inputFormatters,
@@ -204,6 +206,8 @@ class CustomTextFormField extends FormField<String> {
                 onTapOutside: onTapOutside,
                 onEditingComplete: onEditingComplete,
                 onSubmitted: onFieldSubmitted,
+                onNext: onNext,
+                onPrev: onPrev,
                 inputFormatters: inputFormatters,
                 enabled: enabled ?? decoration?.enabled ?? true,
                 cursorWidth: cursorWidth,

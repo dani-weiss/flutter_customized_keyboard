@@ -199,6 +199,8 @@ class CustomTextField extends StatefulWidget {
     this.onChanged,
     this.onEditingComplete,
     this.onSubmitted,
+    this.onNext,
+    this.onPrev,
     this.onAppPrivateCommand,
     this.inputFormatters,
     this.enabled,
@@ -442,6 +444,18 @@ class CustomTextField extends StatefulWidget {
   ///    automatically shift the focus to the next/previous focusable item when
   ///    the user is done editing.
   final ValueChanged<String>? onSubmitted;
+
+  /// Callback when "next" key is pressed.
+  ///
+  /// If this is omitted, the next widget will receive focus when the
+  /// "next" key is pressed.
+  final void Function()? onNext;
+
+  /// Callback when "previous" key is pressed.
+  ///
+  /// If this is omitted, the previous widget will receive focus when the
+  /// "previous" key is pressed.
+  final void Function()? onPrev;
 
   /// {@macro flutter.widgets.editableText.onAppPrivateCommand}
   final AppPrivateCommandCallback? onAppPrivateCommand;
@@ -715,6 +729,8 @@ class _CustomTextFieldState extends State<CustomTextField> with RestorationMixin
         triggerOnChanged: _triggerOnChanged,
         inputFormatters: widget.inputFormatters,
         onSubmit: widget.onSubmitted,
+        onNext: widget.onNext,
+        onPrev: widget.onPrev,
       );
     } else {
       // Not a custom keyboard, don't do anything here.
