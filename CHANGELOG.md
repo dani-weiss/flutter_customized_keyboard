@@ -1,3 +1,6 @@
+## 1.0.3
+* Provide callbacks [onNext] and [onPrev] for special key events.
+
 ## 1.0.2
 * Revert release 1.0.1.
 * Improve auto-scrolling to ensure the newly focused item is visible closest to its original
