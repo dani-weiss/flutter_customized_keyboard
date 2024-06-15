@@ -179,7 +179,17 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
 
       // Remove it and hide the keyboard
       _keyboardConnection = null;
-      _animateOut();
+      // Do this after a possible build is done to prevent an exception that would
+      // occur if the widget is currently rebuilding. It might be that we lost focus
+      // on the textfield due to a widget rebuild.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Only animate out if keyboard connection is null.
+        // This will not be the case if user just changed focus to another field. In that
+        // case the new field would have connected by now.
+        if (_keyboardConnection == null) {
+          _animateOut();
+        }
+      });
     }
 
     // Otherwise, do nothing.

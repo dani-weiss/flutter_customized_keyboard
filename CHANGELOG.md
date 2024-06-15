@@ -1,3 +1,6 @@
+## 1.0.4
+* Bugfix: Exception might've occured when disconnecting due to a widget rebuild. This is now fixed.
+
 ## 1.0.3
 * Provide callbacks [onNext] and [onPrev] for special key events.
 
