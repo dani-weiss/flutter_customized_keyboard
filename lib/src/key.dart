@@ -8,7 +8,7 @@ class CustomKeyboardKey extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(onTap: () => onTap(context), child: child);
+    return InkWell(onTap: () => onTap(context), child: child);
   }
 
   void onTap(BuildContext context) {
