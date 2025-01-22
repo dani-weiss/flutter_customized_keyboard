@@ -58,8 +58,7 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
 
   @override
   Widget build(BuildContext context) {
-    final data = MediaQuery.maybeOf(context) ??
-        MediaQueryData.fromWindow(WidgetsBinding.instance.window);
+    final data = MediaQuery.maybeOf(context) ?? MediaQueryData.fromView(View.of(context));
 
     return MediaQuery(
         // Overwrite data to apply bottom inset for customized keyboard
