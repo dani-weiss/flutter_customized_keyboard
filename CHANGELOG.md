@@ -1,4 +1,4 @@
-## 1.0.5
+## 1.0.6
 ### Breaking changes
 * Don't throw on missing keyboard connection anymore
 
