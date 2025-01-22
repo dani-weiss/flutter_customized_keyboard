@@ -1,4 +1,8 @@
 ## 1.0.5
+### Breaking changes
+* Don't throw on missing keyboard connection anymore
+
+## 1.0.5
 * Added Inkwell to keys.
 
 ## 1.0.4
