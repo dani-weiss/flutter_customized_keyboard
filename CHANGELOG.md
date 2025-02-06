@@ -1,3 +1,6 @@
+## 1.0.7
+* Fixed issue with too much bottom padding for screen.
+
 ## 1.0.6
 ### Breaking changes
 * Don't throw on missing keyboard connection anymore
