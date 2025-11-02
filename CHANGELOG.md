@@ -1,3 +1,11 @@
+## 1.0.8
+### Breaking changes
+* Raised the minimum SDK constraints to Dart 3.5.0 / Flutter 3.32.5.
+
+### Changes
+* Using uuid@4.5.1
+* Updated [CustomTextField] and [CustomTextFormField] to match new flutter version
+
 ## 1.0.7
 * Fixed issue with too much bottom padding for screen.
 

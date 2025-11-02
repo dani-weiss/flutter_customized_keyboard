@@ -173,6 +173,7 @@ class CustomTextField extends StatefulWidget {
     super.key,
     this.controller,
     this.focusNode,
+    this.undoController,
     this.decoration = const InputDecoration(),
     TextInputType? keyboardType,
     this.textInputAction,
@@ -183,8 +184,14 @@ class CustomTextField extends StatefulWidget {
     this.textAlignVertical,
     this.textDirection,
     this.readOnly = false,
+    @Deprecated(
+      'Use `contextMenuBuilder` instead. '
+      'This feature was deprecated after v3.3.0-0.5.pre.',
+    )
+    this.toolbarOptions,
     this.showCursor,
     this.autofocus = false,
+    this.statesController,
     this.obscuringCharacter = '•',
     this.obscureText = false,
     this.autocorrect = true,
@@ -207,7 +214,9 @@ class CustomTextField extends StatefulWidget {
     this.cursorWidth = 2.0,
     this.cursorHeight,
     this.cursorRadius,
+    this.cursorOpacityAnimates,
     this.cursorColor,
+    this.cursorErrorColor,
     this.selectionHeightStyle = ui.BoxHeightStyle.tight,
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
     this.keyboardAppearance,
@@ -216,12 +225,14 @@ class CustomTextField extends StatefulWidget {
     bool? enableInteractiveSelection,
     this.selectionControls,
     this.onTap,
+    this.onTapAlwaysCalled = false,
     this.onTapOutside,
     this.mouseCursor,
     this.buildCounter,
     this.scrollController,
     this.scrollPhysics,
     this.autofillHints = const <String>[],
+    this.contentInsertionConfiguration,
     this.clipBehavior = Clip.hardEdge,
     this.restorationId,
     this.scribbleEnabled = true,
@@ -301,6 +312,11 @@ class CustomTextField extends StatefulWidget {
   /// showing when it is tapped by calling [EditableTextState.requestKeyboard()].
   final FocusNode? focusNode;
 
+  /// Controls the history of edits for undo and redo operations.
+  ///
+  /// See [UndoHistoryController] for details about configuring undo history.
+  final UndoHistoryController? undoController;
+
   /// The decoration to show around the text field.
   ///
   /// By default, draws a horizontal line under the text field but can be
@@ -344,6 +360,13 @@ class CustomTextField extends StatefulWidget {
   /// {@macro flutter.widgets.editableText.autofocus}
   final bool autofocus;
 
+  /// Represents the interactive state for this field via [MaterialState]s.
+  ///
+  /// Provide a custom [MaterialStatesController] to listen for state changes
+  /// such as focus, hover, error, and disabled, or leave null to allow the
+  /// field to manage its own controller.
+  final MaterialStatesController? statesController;
+
   /// {@macro flutter.widgets.editableText.obscuringCharacter}
   final String obscuringCharacter;
 
@@ -377,6 +400,13 @@ class CustomTextField extends StatefulWidget {
 
   /// {@macro flutter.widgets.editableText.readOnly}
   final bool readOnly;
+
+  /// Configuration of the text selection toolbar options.
+  ///
+  /// If unset, select all and paste default to enabled. Copy and cut are
+  /// disabled when [obscureText] is true. When [readOnly] is true, paste and
+  /// cut are disabled regardless.
+  final ToolbarOptions? toolbarOptions;
 
   /// {@macro flutter.widgets.editableText.showCursor}
   final bool? showCursor;
@@ -479,6 +509,9 @@ class CustomTextField extends StatefulWidget {
   /// {@macro flutter.widgets.editableText.cursorRadius}
   final Radius? cursorRadius;
 
+  /// {@macro flutter.widgets.editableText.cursorOpacityAnimates}
+  final bool? cursorOpacityAnimates;
+
   /// The color of the cursor.
   ///
   /// The cursor indicates the current location of text insertion point in
@@ -490,6 +523,9 @@ class CustomTextField extends StatefulWidget {
   /// it will use [CupertinoThemeData.primaryColor]. Otherwise it will use
   /// the value of [ColorScheme.primary] of [ThemeData.colorScheme].
   final Color? cursorColor;
+
+  /// The color of the cursor when the [InputDecorator] reports an error.
+  final Color? cursorErrorColor;
 
   /// Controls how tall the selection highlight boxes are computed to be.
   ///
@@ -524,7 +560,7 @@ class CustomTextField extends StatefulWidget {
   bool get selectionEnabled => enableInteractiveSelection;
 
   /// {@template flutter.material.textfield.onTap}
-  /// Called for each distinct tap except for every second tap of a double tap.
+  /// Called for the first tap in a series of taps.
   ///
   /// The text field builds a [GestureDetector] to handle input events like tap,
   /// to trigger focus requests, to move the caret, adjust the selection, etc.
@@ -543,7 +579,13 @@ class CustomTextField extends StatefulWidget {
   /// To listen to arbitrary pointer events without competing with the
   /// text field's internal gesture detector, use a [Listener].
   /// {@endtemplate}
+  ///
+  /// If [onTapAlwaysCalled] is true, this callback is invoked for every tap,
+  /// including consecutive taps.
   final GestureTapCallback? onTap;
+
+  /// Whether [onTap] should fire for every tap, including consecutive taps.
+  final bool onTapAlwaysCalled;
 
   /// {@macro flutter.widgets.editableText.onTapOutside}
   ///
@@ -623,6 +665,9 @@ class CustomTextField extends StatefulWidget {
   /// {@macro flutter.widgets.editableText.autofillHints}
   /// {@macro flutter.services.AutofillConfiguration.autofillHints}
   final Iterable<String>? autofillHints;
+
+  /// {@macro flutter.widgets.editableText.contentInsertionConfiguration}
+  final ContentInsertionConfiguration? contentInsertionConfiguration;
 
   /// {@macro flutter.material.Material.clipBehavior}
   ///
@@ -839,6 +884,7 @@ class _CustomTextFieldState extends State<CustomTextField> with RestorationMixin
     return TextField(
       controller: _effectiveController,
       focusNode: _effectiveFocusNode,
+      undoController: widget.undoController,
       decoration: widget.decoration,
       keyboardType: (widget.keyboardType is CustomTextInputType)
           ? TextInputType.none
@@ -851,8 +897,10 @@ class _CustomTextFieldState extends State<CustomTextField> with RestorationMixin
       textAlignVertical: widget.textAlignVertical,
       textDirection: widget.textDirection,
       readOnly: widget.readOnly,
+      toolbarOptions: widget.toolbarOptions,
       showCursor: widget.showCursor,
       autofocus: widget.autofocus,
+      statesController: widget.statesController,
       obscuringCharacter: widget.obscuringCharacter,
       obscureText: widget.obscureText,
       autocorrect: widget.autocorrect,
@@ -873,7 +921,9 @@ class _CustomTextFieldState extends State<CustomTextField> with RestorationMixin
       cursorWidth: widget.cursorWidth,
       cursorHeight: widget.cursorHeight,
       cursorRadius: widget.cursorRadius,
+      cursorOpacityAnimates: widget.cursorOpacityAnimates,
       cursorColor: widget.cursorColor,
+      cursorErrorColor: widget.cursorErrorColor,
       selectionHeightStyle: widget.selectionHeightStyle,
       selectionWidthStyle: widget.selectionWidthStyle,
       keyboardAppearance: widget.keyboardAppearance,
@@ -882,12 +932,14 @@ class _CustomTextFieldState extends State<CustomTextField> with RestorationMixin
       enableInteractiveSelection: widget.enableInteractiveSelection,
       selectionControls: widget.selectionControls,
       onTap: _onTap,
+      onTapAlwaysCalled: widget.onTapAlwaysCalled,
       onTapOutside: widget.onTapOutside,
       mouseCursor: widget.mouseCursor,
       buildCounter: widget.buildCounter,
       scrollController: widget.scrollController,
       scrollPhysics: widget.scrollPhysics,
       autofillHints: widget.autofillHints,
+      contentInsertionConfiguration: widget.contentInsertionConfiguration,
       clipBehavior: widget.clipBehavior,
       restorationId: widget.restorationId,
       scribbleEnabled: widget.scribbleEnabled,
