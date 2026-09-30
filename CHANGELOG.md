@@ -1,3 +1,6 @@
+## 1.0.9
+* Corrected reporting of view insets to include bottom padding.
+
 ## 1.0.8
 ### Breaking changes
 * Raised the minimum SDK constraints to Dart 3.5.0 / Flutter 3.32.5.
