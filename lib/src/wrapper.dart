@@ -165,8 +165,22 @@ class KeyboardWrapperState extends State<KeyboardWrapper>
 
   /// Animate keyboard out
   Future<void> _animateOut() {
+    // Hiding is also triggered by a field losing focus while the wrapper is
+    // being removed.
+    if (!mounted) {
+      return Future.value();
+    }
+
     setState(() => _bottomInset = 0.0);
-    return _animationController.reverse();
+    return _animationController.reverse().then((_) {
+      // Forget the keyboard once it is gone. Otherwise the view insets keep
+      // including the bottom padding, which lifts everything above the safe area.
+      // Not while another keyboard is about to be shown (its connection is
+      // already set or still the old one) or one has been shown meanwhile.
+      if (mounted && _keyboardConnection == null && _animationController.isDismissed) {
+        setState(() => _activeKeyboard = null);
+      }
+    });
   }
 
   /// Disconnect the given connection id
