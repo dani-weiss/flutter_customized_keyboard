@@ -1,3 +1,7 @@
+## 1.0.10
+* Fixed the bottom view inset staying at the bottom padding after a keyboard was hidden. The wrapper now forgets the keyboard once it is gone, so scaffolds below it get their full height back.
+* No longer calls `setState` when a field loses focus while the wrapper is being removed.
+
 ## 1.0.9
 * Corrected reporting of view insets to include bottom padding.
 
