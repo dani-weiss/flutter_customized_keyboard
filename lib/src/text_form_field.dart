@@ -1,4 +1,7 @@
 part of "../customized_keyboard.dart";
+// Deprecated options stay available for backwards compatibility, like in
+// [TextField] itself, and are forwarded as they are.
+// ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package
 
 /// A [FormField] that contains a [CustomTextField].
 ///
@@ -85,6 +88,7 @@ class CustomTextFormField extends FormField<String> {
   /// and [CustomTextField.new], the constructor.
   CustomTextFormField({
     super.key,
+    this.groupId = EditableText,
     this.controller,
     String? initialValue,
     FocusNode? focusNode,
@@ -107,7 +111,7 @@ class CustomTextFormField extends FormField<String> {
     bool? showCursor,
     String obscuringCharacter = '•',
     bool obscureText = false,
-    bool autocorrect = true,
+    bool? autocorrect,
     SmartDashesType? smartDashesType,
     SmartQuotesType? smartQuotesType,
     bool enableSuggestions = true,
@@ -120,6 +124,7 @@ class CustomTextFormField extends FormField<String> {
     GestureTapCallback? onTap,
     bool onTapAlwaysCalled = false,
     TapRegionCallback? onTapOutside,
+    TapRegionUpCallback? onTapUpOutside,
     VoidCallback? onEditingComplete,
     ValueChanged<String>? onFieldSubmitted,
     void Function()? onNext,
@@ -128,6 +133,7 @@ class CustomTextFormField extends FormField<String> {
     super.validator,
     List<TextInputFormatter>? inputFormatters,
     bool? enabled,
+    bool? ignorePointers,
     double cursorWidth = 2.0,
     double? cursorHeight,
     Radius? cursorRadius,
@@ -136,6 +142,7 @@ class CustomTextFormField extends FormField<String> {
     Brightness? keyboardAppearance,
     EdgeInsets scrollPadding = const EdgeInsets.all(20.0),
     bool? enableInteractiveSelection,
+    bool? selectAllOnFocus,
     TextSelectionControls? selectionControls,
     InputCounterWidgetBuilder? buildCounter,
     ScrollPhysics? scrollPhysics,
@@ -151,13 +158,20 @@ class CustomTextFormField extends FormField<String> {
     UndoHistoryController? undoController,
     AppPrivateCommandCallback? onAppPrivateCommand,
     bool? cursorOpacityAnimates,
-    ui.BoxHeightStyle selectionHeightStyle = ui.BoxHeightStyle.tight,
-    ui.BoxWidthStyle selectionWidthStyle = ui.BoxWidthStyle.tight,
+    ui.BoxHeightStyle? selectionHeightStyle,
+    ui.BoxWidthStyle? selectionWidthStyle,
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
     ContentInsertionConfiguration? contentInsertionConfiguration,
-    MaterialStatesController? statesController,
+    WidgetStatesController? statesController,
     Clip clipBehavior = Clip.hardEdge,
+    @Deprecated(
+      'Use `stylusHandwritingEnabled` instead. '
+      'This feature was deprecated after v3.27.0-0.2.pre.',
+    )
     bool scribbleEnabled = true,
+    bool stylusHandwritingEnabled = EditableText.defaultStylusHandwritingEnabled,
+    bool? enableInlinePrediction,
+    List<Locale>? hintLocales,
     bool canRequestFocus = true,
   })  : assert(initialValue == null || controller == null),
         assert(obscuringCharacter.length == 1),
@@ -192,6 +206,7 @@ class CustomTextFormField extends FormField<String> {
             return UnmanagedRestorationScope(
               bucket: field.bucket,
               child: CustomTextField(
+                groupId: groupId,
                 restorationId: restorationId,
                 controller: state._effectiveController,
                 focusNode: focusNode,
@@ -226,6 +241,7 @@ class CustomTextFormField extends FormField<String> {
                 onTap: onTap,
                 onTapAlwaysCalled: onTapAlwaysCalled,
                 onTapOutside: onTapOutside,
+                onTapUpOutside: onTapUpOutside,
                 onEditingComplete: onEditingComplete,
                 onSubmitted: onFieldSubmitted,
                 onNext: onNext,
@@ -233,6 +249,7 @@ class CustomTextFormField extends FormField<String> {
                 onAppPrivateCommand: onAppPrivateCommand,
                 inputFormatters: inputFormatters,
                 enabled: enabled ?? decoration?.enabled ?? true,
+                ignorePointers: ignorePointers,
                 cursorWidth: cursorWidth,
                 cursorHeight: cursorHeight,
                 cursorRadius: cursorRadius,
@@ -244,6 +261,7 @@ class CustomTextFormField extends FormField<String> {
                 keyboardAppearance: keyboardAppearance,
                 enableInteractiveSelection:
                     enableInteractiveSelection ?? (!obscureText || !readOnly),
+                selectAllOnFocus: selectAllOnFocus,
                 selectionControls: selectionControls,
                 buildCounter: buildCounter,
                 autofillHints: autofillHints,
@@ -260,11 +278,17 @@ class CustomTextFormField extends FormField<String> {
                 contentInsertionConfiguration: contentInsertionConfiguration,
                 clipBehavior: clipBehavior,
                 scribbleEnabled: scribbleEnabled,
+                stylusHandwritingEnabled: stylusHandwritingEnabled,
+                enableInlinePrediction: enableInlinePrediction,
+                hintLocales: hintLocales,
                 canRequestFocus: canRequestFocus,
               ),
             );
           },
         );
+
+  /// {@macro flutter.widgets.editableText.groupId}
+  final Object groupId;
 
   /// Controls the text being edited.
   ///

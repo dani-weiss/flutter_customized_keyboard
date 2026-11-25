@@ -1,6 +1,10 @@
 ## 2.0.0
 * **Breaking:** built on `package:material_ui` instead of the deprecated `package:flutter/material.dart`. `CustomTextField` and `CustomTextFormField` take material_ui types (`InputDecoration` etc.) and resolve the material_ui `Theme`.
 * Requires Flutter 3.47 / Dart 3.13 or newer.
+* `CustomTextField` and `CustomTextFormField` now accept the options added to `TextField` / `TextFormField` in recent Flutter versions: `groupId`, `ignorePointers`, `selectAllOnFocus`, `onTapUpOutside`, `stylusHandwritingEnabled`, `enableInlinePrediction` and `hintLocales`.
+* `scribbleEnabled` is deprecated in favour of `stylusHandwritingEnabled`, like in `TextField`. `statesController` is now a `WidgetStatesController` (`MaterialStatesController` is an alias of it, so existing code keeps working).
+* `autocorrect`, `selectionHeightStyle` and `selectionWidthStyle` default to `null` instead of `true` / `tight`, so the fields follow the platform and theme defaults like `TextField` does. Pass the values explicitly to keep the old behavior.
+* Added widget tests for both text fields.
 
 ## 1.0.10
 * Fixed the bottom view inset staying at the bottom padding after a keyboard was hidden. The wrapper now forgets the keyboard once it is gone, so scaffolds below it get their full height back.

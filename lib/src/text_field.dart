@@ -1,4 +1,7 @@
 part of "../customized_keyboard.dart";
+// Deprecated options stay available for backwards compatibility, like in
+// [TextField] itself, and are forwarded as they are.
+// ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package
 
 /// Creates a Material Design text field that works with custom keyboards.
 ///
@@ -171,6 +174,7 @@ class CustomTextField extends StatefulWidget {
   ///    characters" and how it may differ from the intuitive meaning.
   const CustomTextField({
     super.key,
+    this.groupId = EditableText,
     this.controller,
     this.focusNode,
     this.undoController,
@@ -194,7 +198,7 @@ class CustomTextField extends StatefulWidget {
     this.statesController,
     this.obscuringCharacter = '•',
     this.obscureText = false,
-    this.autocorrect = true,
+    this.autocorrect,
     SmartDashesType? smartDashesType,
     SmartQuotesType? smartQuotesType,
     this.enableSuggestions = true,
@@ -211,22 +215,25 @@ class CustomTextField extends StatefulWidget {
     this.onAppPrivateCommand,
     this.inputFormatters,
     this.enabled,
+    this.ignorePointers,
     this.cursorWidth = 2.0,
     this.cursorHeight,
     this.cursorRadius,
     this.cursorOpacityAnimates,
     this.cursorColor,
     this.cursorErrorColor,
-    this.selectionHeightStyle = ui.BoxHeightStyle.tight,
-    this.selectionWidthStyle = ui.BoxWidthStyle.tight,
+    this.selectionHeightStyle,
+    this.selectionWidthStyle,
     this.keyboardAppearance,
     this.scrollPadding = const EdgeInsets.all(20.0),
     this.dragStartBehavior = DragStartBehavior.start,
     bool? enableInteractiveSelection,
+    this.selectAllOnFocus,
     this.selectionControls,
     this.onTap,
     this.onTapAlwaysCalled = false,
     this.onTapOutside,
+    this.onTapUpOutside,
     this.mouseCursor,
     this.buildCounter,
     this.scrollController,
@@ -235,12 +242,19 @@ class CustomTextField extends StatefulWidget {
     this.contentInsertionConfiguration,
     this.clipBehavior = Clip.hardEdge,
     this.restorationId,
+    @Deprecated(
+      'Use `stylusHandwritingEnabled` instead. '
+      'This feature was deprecated after v3.27.0-0.2.pre.',
+    )
     this.scribbleEnabled = true,
+    this.stylusHandwritingEnabled = EditableText.defaultStylusHandwritingEnabled,
     this.enableIMEPersonalizedLearning = true,
+    this.enableInlinePrediction,
     this.contextMenuBuilder = _defaultContextMenuBuilder,
     this.canRequestFocus = true,
     this.spellCheckConfiguration,
     this.magnifierConfiguration,
+    this.hintLocales,
   })  : keyboardType = keyboardType ??
             (maxLines == 1 ? TextInputType.text : TextInputType.multiline),
         smartDashesType = smartDashesType ??
@@ -360,12 +374,12 @@ class CustomTextField extends StatefulWidget {
   /// {@macro flutter.widgets.editableText.autofocus}
   final bool autofocus;
 
-  /// Represents the interactive state for this field via [MaterialState]s.
+  /// Represents the interactive state for this field via [WidgetState]s.
   ///
-  /// Provide a custom [MaterialStatesController] to listen for state changes
+  /// Provide a custom [WidgetStatesController] to listen for state changes
   /// such as focus, hover, error, and disabled, or leave null to allow the
   /// field to manage its own controller.
-  final MaterialStatesController? statesController;
+  final WidgetStatesController? statesController;
 
   /// {@macro flutter.widgets.editableText.obscuringCharacter}
   final String obscuringCharacter;
@@ -374,7 +388,7 @@ class CustomTextField extends StatefulWidget {
   final bool obscureText;
 
   /// {@macro flutter.widgets.editableText.autocorrect}
-  final bool autocorrect;
+  final bool? autocorrect;
 
   /// {@macro flutter.services.TextInputConfiguration.smartDashesType}
   final SmartDashesType smartDashesType;
@@ -530,12 +544,12 @@ class CustomTextField extends StatefulWidget {
   /// Controls how tall the selection highlight boxes are computed to be.
   ///
   /// See [ui.BoxHeightStyle] for details on available styles.
-  final ui.BoxHeightStyle selectionHeightStyle;
+  final ui.BoxHeightStyle? selectionHeightStyle;
 
   /// Controls how wide the selection highlight boxes are computed to be.
   ///
   /// See [ui.BoxWidthStyle] for details on available styles.
-  final ui.BoxWidthStyle selectionWidthStyle;
+  final ui.BoxWidthStyle? selectionWidthStyle;
 
   /// The appearance of the keyboard.
   ///
@@ -694,7 +708,34 @@ class CustomTextField extends StatefulWidget {
   final String? restorationId;
 
   /// {@macro flutter.widgets.editableText.scribbleEnabled}
+  @Deprecated(
+    'Use `stylusHandwritingEnabled` instead. '
+    'This feature was deprecated after v3.27.0-0.2.pre.',
+  )
   final bool scribbleEnabled;
+
+  /// {@macro flutter.widgets.editableText.stylusHandwritingEnabled}
+  final bool stylusHandwritingEnabled;
+
+  /// {@macro flutter.widgets.editableText.enableInlinePrediction}
+  final bool? enableInlinePrediction;
+
+  /// {@macro flutter.widgets.editableText.hintLocales}
+  final List<Locale>? hintLocales;
+
+  /// {@macro flutter.widgets.editableText.groupId}
+  final Object groupId;
+
+  /// Whether pointer events are ignored by the field.
+  ///
+  /// Defaults to `!enabled`, see [TextField.ignorePointers].
+  final bool? ignorePointers;
+
+  /// {@macro flutter.widgets.editableText.selectAllOnFocus}
+  final bool? selectAllOnFocus;
+
+  /// {@macro flutter.widgets.editableText.onTapUpOutside}
+  final TapRegionUpCallback? onTapUpOutside;
 
   /// {@macro flutter.services.TextInputConfiguration.enableIMEPersonalizedLearning}
   final bool enableIMEPersonalizedLearning;
@@ -882,6 +923,7 @@ class _CustomTextFieldState extends State<CustomTextField> with RestorationMixin
   @override
   Widget build(BuildContext context) {
     return TextField(
+      groupId: widget.groupId,
       controller: _effectiveController,
       focusNode: _effectiveFocusNode,
       undoController: widget.undoController,
@@ -918,6 +960,7 @@ class _CustomTextFieldState extends State<CustomTextField> with RestorationMixin
       onAppPrivateCommand: widget.onAppPrivateCommand,
       inputFormatters: widget.inputFormatters,
       enabled: widget.enabled,
+      ignorePointers: widget.ignorePointers,
       cursorWidth: widget.cursorWidth,
       cursorHeight: widget.cursorHeight,
       cursorRadius: widget.cursorRadius,
@@ -930,10 +973,12 @@ class _CustomTextFieldState extends State<CustomTextField> with RestorationMixin
       scrollPadding: widget.scrollPadding,
       dragStartBehavior: widget.dragStartBehavior,
       enableInteractiveSelection: widget.enableInteractiveSelection,
+      selectAllOnFocus: widget.selectAllOnFocus,
       selectionControls: widget.selectionControls,
       onTap: _onTap,
       onTapAlwaysCalled: widget.onTapAlwaysCalled,
       onTapOutside: widget.onTapOutside,
+      onTapUpOutside: widget.onTapUpOutside,
       mouseCursor: widget.mouseCursor,
       buildCounter: widget.buildCounter,
       scrollController: widget.scrollController,
@@ -943,10 +988,13 @@ class _CustomTextFieldState extends State<CustomTextField> with RestorationMixin
       clipBehavior: widget.clipBehavior,
       restorationId: widget.restorationId,
       scribbleEnabled: widget.scribbleEnabled,
+      stylusHandwritingEnabled: widget.stylusHandwritingEnabled,
       enableIMEPersonalizedLearning: widget.enableIMEPersonalizedLearning,
+      enableInlinePrediction: widget.enableInlinePrediction,
       contextMenuBuilder: widget.contextMenuBuilder,
       spellCheckConfiguration: widget.spellCheckConfiguration,
       magnifierConfiguration: widget.magnifierConfiguration,
+      hintLocales: widget.hintLocales,
     );
   }
 }
