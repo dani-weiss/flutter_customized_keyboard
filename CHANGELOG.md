@@ -1,3 +1,7 @@
+## 2.0.0
+* **Breaking:** built on `package:material_ui` instead of the deprecated `package:flutter/material.dart`. `CustomTextField` and `CustomTextFormField` take material_ui types (`InputDecoration` etc.) and resolve the material_ui `Theme`.
+* Requires Flutter 3.47 / Dart 3.13 or newer.
+
 ## 1.0.10
 * Fixed the bottom view inset staying at the bottom padding after a keyboard was hidden. The wrapper now forgets the keyboard once it is gone, so scaffolds below it get their full height back.
 * No longer calls `setState` when a field loses focus while the wrapper is being removed.
