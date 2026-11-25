@@ -1,16 +1,17 @@
 name: customized_keyboard
 description: Use custom keyboards in flutter.
-version: 1.0.10
+version: 2.0.0
 repository: https://github.com/dani-weiss/flutter_customized_keyboard.git
 
 environment:
-  sdk: '>=3.5.0 <4.0.0'
-  flutter: ">=3.32.5"
+  sdk: '>=3.13.0 <4.0.0'
+  flutter: ">=3.47.0"
 
 dependencies:
   flutter:
     sdk: flutter
   uuid: ^4.5.1
+  material_ui: ^1.11.1
 
 dev_dependencies:
   flutter_test:
